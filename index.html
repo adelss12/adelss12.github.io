@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1220">
+
+  <title>برامج عادل</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top right, #17345f 0, transparent 35%),
+        radial-gradient(circle at bottom left, #0b5f68 0, transparent 32%),
+        #08111f;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1100px, 92%);
+      margin: auto;
+      padding: 55px 0;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 45px;
+    }
+
+    .logo {
+      width: 78px;
+      height: 78px;
+      margin: 0 auto 18px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      font-size: 38px;
+      background: linear-gradient(145deg, #1e88e5, #0bb6a0);
+      box-shadow: 0 12px 35px rgba(0,0,0,.35);
+    }
+
+    h1 {
+      font-size: clamp(30px, 6vw, 48px);
+      margin-bottom: 12px;
+    }
+
+    header p {
+      color: #b9c7da;
+      font-size: 17px;
+      line-height: 1.9;
+      max-width: 650px;
+      margin: auto;
+    }
+
+    .apps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: rgba(255,255,255,.075);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 24px;
+      padding: 25px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 35px rgba(0,0,0,.18);
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      background: rgba(255,255,255,.11);
+    }
+
+    .app-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 19px;
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+      margin-bottom: 18px;
+      background: linear-gradient(145deg, #1b77d2, #12a89d);
+      box-shadow: 0 8px 22px rgba(0,0,0,.28);
+    }
+
+    .card h2 {
+      font-size: 21px;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: #b9c7da;
+      font-size: 14px;
+      line-height: 1.8;
+      min-height: 50px;
+      margin-bottom: 20px;
+    }
+
+    .open {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      color: white;
+      font-weight: 700;
+      padding: 12px 16px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #147bd1, #0ba594);
+      transition: opacity .2s ease;
+    }
+
+    .open:hover {
+      opacity: .85;
+    }
+
+    footer {
+      text-align: center;
+      color: #8293aa;
+      margin-top: 45px;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        width: 91%;
+        padding: 35px 0;
+      }
+
+      header {
+        margin-bottom: 30px;
+      }
+
+      .apps {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 21px;
+      }
+
+      .card p {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="container">
+
+    <header>
+      <div class="logo">🧰</div>
+      <h1>برامج عادل</h1>
+      <p>
+        مجموعة من البرامج والأدوات العربية البسيطة التي طورتها
+        لتنظيم الأعمال والمهام اليومية، وتعمل مباشرة من المتصفح.
+      </p>
+    </header>
+
+    <section class="apps">
+
+      <article class="card">
+        <div class="app-icon">📅</div>
+        <h2>التقويم العائلي</h2>
+        <p>تنظيم المواعيد والأحداث العائلية ومشاركتها مع دعم التاريخ الهجري.</p>
+        <a class="open" href="https://adelss12.github.io/fc/">فتح البرنامج</a>
+      </article>
+
+      <article class="card">
+        <div class="app-icon">👥</div>
+        <h2>دليل أرقامي</h2>
+        <p>إدارة جهات الاتصال والبحث فيها مع دعم ملفات VCF وCSV.</p>
+        <a class="open" href="https://adelss12.github.io/contacts/">فتح البرنامج</a>
+      </article>
+
+      <article class="card">
+        <div class="app-icon">💳</div>
+        <h2>مصروفاتي</h2>
+        <p>تسجيل المصروفات الشخصية ومتابعتها بطريقة بسيطة وسريعة.</p>
+        <a class="open" href="https://adelss12.github.io/masrofati-iphone/">فتح البرنامج</a>
+      </article>
+
+      <article class="card">
+        <div class="app-icon">▦</div>
+        <h2>صانع QR</h2>
+        <p>إنشاء رموز QR للروابط والنصوص وأرقام الهاتف وشبكات Wi-Fi.</p>
+        <a class="open" href="https://adelss12.github.io/qr/">فتح البرنامج</a>
+      </article>
+
+      <article class="card">
+        <div class="app-icon">🗺️</div>
+        <h2>تحويل الخرائط</h2>
+        <p>تحويل المواقع المحفوظة وروابط Google Maps إلى خرائط Apple.</p>
+        <a class="open" href="https://adelss12.github.io/google_to_apple_maps/">فتح البرنامج</a>
+      </article>
+
+      <article class="card">
+        <div class="app-icon">💰</div>
+        <h2>صندوق العائلة</h2>
+        <p>إدارة اشتراكات العائلة والإيرادات والمصروفات ومتابعة الصندوق.</p>
+        <a class="open" href="https://adelss12.github.io/family-fund/">فتح البرنامج</a>
+      </article>
+
+      <article class="card">
+        <div class="app-icon">📄</div>
+        <h2>تقليص PDF</h2>
+        <p>تقليص وضغط ملفات PDF داخل المتصفح مع المحافظة على الخصوصية.</p>
+        <a class="open" href="https://adelss12.github.io/taqlis-pdf/">فتح البرنامج</a>
+      </article>
+
+    </section>
+
+    <footer>
+      <div>برامج وأدوات شخصية من تطوير عادل الغامدي</div>
+      <div>© 2026</div>
+    </footer>
+
+  </main>
+
+</body>
+</html>
