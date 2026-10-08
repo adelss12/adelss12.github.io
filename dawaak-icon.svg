@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">أيقونة افهم دواءك</title>
+  <desc id="desc">كبسولة دواء بيضاء وخضراء مع نجمة معرفة على خلفية تركوازية</desc>
+  <defs>
+    <linearGradient id="bg" x1="70" y1="45" x2="442" y2="467" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#16b8a6"/>
+      <stop offset="1" stop-color="#08766f"/>
+    </linearGradient>
+    <linearGradient id="pill" x1="162" y1="148" x2="355" y2="359" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e8fffb"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#043f3b" flood-opacity=".32"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="118" fill="url(#bg)"/>
+  <circle cx="96" cy="102" r="54" fill="#ffffff" opacity=".08"/>
+  <circle cx="437" cy="410" r="88" fill="#ffffff" opacity=".07"/>
+  <g filter="url(#shadow)" transform="rotate(-43 256 256)">
+    <rect x="144" y="95" width="224" height="322" rx="112" fill="url(#pill)"/>
+    <path d="M144 256h224v49c0 61.9-50.1 112-112 112s-112-50.1-112-112v-49Z" fill="#0b827a"/>
+    <path d="M144 256h224" stroke="#07645f" stroke-width="12"/>
+    <path d="M191 143c20-20 45-30 73-28" fill="none" stroke="#fff" stroke-width="15" stroke-linecap="round" opacity=".72"/>
+  </g>
+  <g fill="#fff">
+    <path d="M394 78c4 18 15 29 33 33-18 4-29 15-33 33-4-18-15-29-33-33 18-4 29-15 33-33Z"/>
+    <circle cx="431" cy="170" r="10" opacity=".8"/>
+  </g>
+</svg>
