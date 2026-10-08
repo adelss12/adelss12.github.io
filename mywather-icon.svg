@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">أيقونة طقسي</title>
+  <desc id="desc">شمس وسحابة وقطرات مطر على خلفية زرقاء</desc>
+  <defs>
+    <linearGradient id="bg" x1="64" y1="35" x2="448" y2="477" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1b9fe7"/>
+      <stop offset=".55" stop-color="#0877b8"/>
+      <stop offset="1" stop-color="#074f7e"/>
+    </linearGradient>
+    <linearGradient id="cloud" x1="180" y1="210" x2="347" y2="362" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dff5ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="170%" height="180%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#033956" flood-opacity=".35"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="118" fill="url(#bg)"/>
+  <circle cx="401" cy="105" r="62" fill="#ffd45b"/>
+  <g stroke="#ffd45b" stroke-width="14" stroke-linecap="round" opacity=".95">
+    <path d="M401 21v22M401 167v22M317 105h22M463 105h22M342 46l16 16M444 148l16 16M342 164l16-16M444 62l16-16"/>
+  </g>
+  <g filter="url(#shadow)">
+    <path d="M139 346c-43 0-78-34-78-76 0-39 30-71 68-76 17-61 72-104 137-104 75 0 137 57 143 130 34 9 59 40 59 77 0 44-36 80-81 80H139Z" fill="url(#cloud)"/>
+    <path d="M129 194c23-9 50-8 73 2 28-50 91-73 144-51" fill="none" stroke="#fff" stroke-width="15" stroke-linecap="round" opacity=".72"/>
+  </g>
+  <g fill="#7ddcff">
+    <path d="M177 397c0 21-15 38-34 38s-34-17-34-38c0-17 22-46 34-61 12 15 34 44 34 61Z"/>
+    <path d="M290 421c0 21-15 38-34 38s-34-17-34-38c0-17 22-46 34-61 12 15 34 44 34 61Z"/>
+    <path d="M403 397c0 21-15 38-34 38s-34-17-34-38c0-17 22-46 34-61 12 15 34 44 34 61Z"/>
+  </g>
+</svg>
