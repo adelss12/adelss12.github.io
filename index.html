@@ -2,8 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0b1220">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#08111f">
+  <meta name="description" content="مجموعة برامج وأدوات عربية بسيطة تعمل مباشرة من المتصفح">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
 
   <title>برامج عادل</title>
   <link rel="icon" type="image/png" href="apple-touch-icon.png">
@@ -23,8 +29,16 @@
         radial-gradient(circle at top right, #17345f 0, transparent 35%),
         radial-gradient(circle at bottom left, #0b5f68 0, transparent 32%),
         #08111f;
+      background-attachment: fixed;
       color: #fff;
       min-height: 100vh;
+      min-height: 100dvh;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      padding:
+        env(safe-area-inset-top) env(safe-area-inset-right)
+        env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
     .container {
@@ -74,6 +88,7 @@
     }
 
     .card {
+      position: relative;
       background: rgba(255,255,255,.075);
       border: 1px solid rgba(255,255,255,.12);
       border-radius: 24px;
@@ -83,9 +98,30 @@
       transition: transform .2s ease, background .2s ease;
     }
 
-    .card:hover {
-      transform: translateY(-4px);
+    @media (hover: hover) {
+      .card:hover {
+        transform: translateY(-4px);
+        background: rgba(255,255,255,.11);
+      }
+      .open:hover { opacity: .85; }
+    }
+
+    .card:active {
+      transform: scale(.985);
       background: rgba(255,255,255,.11);
+    }
+
+    /* البطاقة كلها قابلة للضغط */
+    .open::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+    }
+
+    .open:focus-visible {
+      outline: 3px solid #36a3ff;
+      outline-offset: 3px;
     }
 
     .app-icon {
@@ -130,10 +166,6 @@
       transition: opacity .2s ease;
     }
 
-    .open:hover {
-      opacity: .85;
-    }
-
     footer {
       text-align: center;
       color: #8293aa;
@@ -142,33 +174,100 @@
       line-height: 1.9;
     }
 
+    /* الجوال: قائمة مدمجة مثل تطبيقات الآيفون */
     @media (max-width: 600px) {
       .container {
-        width: 91%;
-        padding: 35px 0;
+        width: auto;
+        padding: 26px 16px 30px;
       }
 
       header {
-        margin-bottom: 30px;
+        margin-bottom: 24px;
+      }
+
+      .logo {
+        width: 92px;
+        height: 92px;
+        border-radius: 22px;
+        margin-bottom: 16px;
+      }
+      .logo img { border-radius: 22px; }
+
+      header p {
+        font-size: 15px;
+        line-height: 1.8;
       }
 
       .apps {
         grid-template-columns: 1fr;
+        gap: 10px;
       }
 
       .card {
-        padding: 21px;
-      }
-
-      .card p {
-        min-height: auto;
+        display: grid;
+        grid-template-columns: 58px 1fr 18px;
+        grid-template-areas:
+          "icon title arrow"
+          "icon desc  arrow";
+        column-gap: 14px;
+        row-gap: 2px;
+        align-items: center;
+        padding: 13px 14px;
+        border-radius: 18px;
+        min-height: 84px;
       }
 
       .app-icon {
-        width: 66px;
-        height: 66px;
-        border-radius: 18px;
+        grid-area: icon;
+        width: 58px;
+        height: 58px;
+        border-radius: 14px;
+        margin: 0;
       }
+
+      .card h2 {
+        grid-area: title;
+        font-size: 17px;
+        margin: 0;
+        align-self: end;
+      }
+
+      .card p {
+        grid-area: desc;
+        font-size: 13px;
+        line-height: 1.55;
+        min-height: auto;
+        margin: 0;
+        align-self: start;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      /* الزر يصبح سهمًا صغيرًا، والبطاقة كلها رابط */
+      .open {
+        grid-area: arrow;
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        background: none;
+        font-size: 0;
+        color: transparent;
+        border-left: 2.5px solid #7f93ad;
+        border-bottom: 2.5px solid #7f93ad;
+        border-radius: 2px;
+        transform: rotate(45deg) scale(.6);
+      }
+
+      footer {
+        margin-top: 30px;
+        font-size: 13px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card, .open { transition: none; }
     }
   </style>
 </head>
@@ -179,7 +278,7 @@
 
     <header>
       <div class="logo">
-  <img src="apple-touch-icon.png" alt="برامج عادل">
+  <img src="logo.webp" alt="برامج عادل" width="120" height="120">
 </div>
       <p>
         مجموعة من البرامج والأدوات العربية البسيطة التي طورتها
@@ -192,7 +291,7 @@
       <!-- افهم دواءك -->
       <article class="card">
         <div class="app-icon">
-          <img src="dawaak-icon.svg" alt="أيقونة افهم دواءك">
+          <img loading="lazy" decoding="async" width="72" height="72" src="dawaak-icon.svg" alt="أيقونة افهم دواءك">
         </div>
         <h2>افهم دواءك</h2>
         <p>ملخص عربي مبسط للتعرّف على الدواء واستخداماته وإرشاداته لأغراض التثقيف الشخصي.</p>
@@ -202,7 +301,7 @@
       <!-- طقسي -->
       <article class="card">
         <div class="app-icon">
-          <img src="mywather-icon.svg" alt="أيقونة طقسي">
+          <img loading="lazy" decoding="async" width="72" height="72" src="mywather-icon.svg" alt="أيقونة طقسي">
         </div>
         <h2>طقسي</h2>
         <p>حالة الطقس وتوقعات الأيام القادمة مع تحديد المدينة والتنبيهات الرسمية السعودية.</p>
@@ -212,7 +311,7 @@
       <!-- التقويم العائلي -->
       <article class="card">
         <div class="app-icon">
-          <img src="https://adelss12.github.io/fc/apple-touch-icon.png" alt="التقويم العائلي">
+          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/fc/apple-touch-icon.png" alt="التقويم العائلي">
         </div>
         <h2>التقويم العائلي</h2>
         <p>تنظيم المواعيد والأحداث العائلية ومشاركتها مع دعم التاريخ الهجري.</p>
@@ -222,7 +321,7 @@
       <!-- دليل أرقامي -->
       <article class="card">
         <div class="app-icon">
-          <img src="https://adelss12.github.io/contacts/assets/apple-touch-icon.png" alt="دليل أرقامي">
+          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/contacts/assets/apple-touch-icon.png" alt="دليل أرقامي">
         </div>
         <h2>دليل أرقامي</h2>
         <p>إدارة جهات الاتصال والبحث فيها مع دعم ملفات VCF وCSV.</p>
@@ -232,7 +331,7 @@
       <!-- مصروفاتي -->
       <article class="card">
         <div class="app-icon">
-          <img src="https://adelss12.github.io/masrofati-iphone/apple-touch-icon.png" alt="مصروفاتي">
+          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/masrofati-iphone/apple-touch-icon.png" alt="مصروفاتي">
         </div>
         <h2>مصروفاتي</h2>
         <p>تسجيل المصروفات الشخصية ومتابعتها بطريقة بسيطة وسريعة.</p>
@@ -242,7 +341,7 @@
       <!-- صانع QR -->
       <article class="card">
         <div class="app-icon">
-          <img src="https://adelss12.github.io/qr/apple-touch-icon.png" alt="صانع QR">
+          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/qr/apple-touch-icon.png" alt="صانع QR">
         </div>
         <h2>صانع QR</h2>
         <p>إنشاء رموز QR للروابط والنصوص وأرقام الهاتف وشبكات Wi-Fi.</p>
@@ -252,7 +351,7 @@
       <!-- تحويل الخرائط -->
       <article class="card">
         <div class="app-icon">
-          <img src="https://adelss12.github.io/google_to_apple_maps/apple-touch-icon.png" alt="تحويل الخرائط">
+          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/google_to_apple_maps/apple-touch-icon.png" alt="تحويل الخرائط">
         </div>
         <h2>تحويل الخرائط</h2>
         <p>تحويل المواقع المحفوظة وروابط Google Maps إلى خرائط Apple.</p>
@@ -262,7 +361,7 @@
       <!-- صندوق العائلة -->
       <article class="card">
         <div class="app-icon">
-          <img src="https://adelss12.github.io/family-fund/apple-touch-icon.png" alt="صندوق العائلة">
+          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/family-fund/apple-touch-icon.png" alt="صندوق العائلة">
         </div>
         <h2>صندوق العائلة</h2>
         <p>إدارة اشتراكات العائلة والإيرادات والمصروفات ومتابعة الصندوق.</p>
@@ -272,7 +371,7 @@
       <!-- تقليص PDF -->
       <article class="card">
         <div class="app-icon">
-          <img src="https://adelss12.github.io/taqlis-pdf/apple-touch-icon.png" alt="تقليص PDF">
+          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/taqlis-pdf/apple-touch-icon.png" alt="تقليص PDF">
         </div>
         <h2>تقليص PDF</h2>
         <p>تقليص وضغط ملفات PDF داخل المتصفح مع المحافظة على الخصوصية.</p>
