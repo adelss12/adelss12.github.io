@@ -254,10 +254,20 @@
         background: none;
         font-size: 0;
         color: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* السهم يُرسم بعنصر داخلي حتى تبقى البطاقة كلها قابلة للضغط */
+      .open::before {
+        content: "";
+        width: 10px;
+        height: 10px;
         border-left: 2.5px solid #7f93ad;
         border-bottom: 2.5px solid #7f93ad;
-        border-radius: 2px;
-        transform: rotate(45deg) scale(.6);
+        border-radius: 1px;
+        transform: rotate(45deg);
       }
 
       footer {
