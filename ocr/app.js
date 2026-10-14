@@ -107,6 +107,8 @@ function cleanText(t) {
     .replace(/\r/g, '')
     // ة و ى لا تأتيان إلا آخر الكلمة: إن التصقت بها كلمة بعدها نفصلهما
     .replace(/([ةى])(?=[\u0621-\u064A])/g, '$1 ')
+    // «ء» آخر الكلمة تلتصق بها «ال» التالية كثيرًا: الذكاءالاصطناعي
+    .replace(/ء(?=ال[\u0621-\u064A])/g, 'ء ')
     // بقايا خطوط الجداول: | منفردة، أو ١ ملتصقة بحرف عربي (لا تأتي هكذا في نص حقيقي)
     .replace(/(^|[ \t])[|¦]+(?=[ \t]|$)/gm, '$1')
     .replace(/([ء-يً-ْ])١+(?![٠-٩])/g, '$1')
@@ -140,7 +142,7 @@ async function renderImage(file, rotation) {
   const bmp = await createImageBitmap(file);
   // الصور الصغيرة تُكبَّر، لأن Tesseract يقرأ الحروف الصغيرة بشكل أسوأ
   const longSide = Math.max(bmp.width, bmp.height);
-  const scale = longSide < 2000 ? Math.min(2, 2400 / longSide) : Math.min(1, MAX_SIDE / longSide);
+  const scale = longSide < 2400 ? Math.min(3, 3000 / longSide) : Math.min(1, MAX_SIDE / longSide);
   const w = Math.round(bmp.width * scale), h = Math.round(bmp.height * scale);
   const swap = rotation === 90 || rotation === 270;
   const canvas = document.createElement('canvas');
@@ -157,7 +159,25 @@ async function renderImage(file, rotation) {
   return canvas;
 }
 
-// تجهيز الصورة: تدرج رمادي دائمًا، ثم (اختياريًا) شد التباين وإزالة خطوط الجداول
+// حد الفصل بطريقة Otsu: أفضل قيمة تفصل الصورة إلى فئتين (نص / خلفية)
+function otsu(hist, from = 0) {
+  let n = 0, sum = 0;
+  for (let i = from; i < 256; i++) { n += hist[i]; sum += i * hist[i]; }
+  let wB = 0, sB = 0, best = -1, t = 128;
+  for (let i = from; i < 256; i++) {
+    wB += hist[i]; if (!wB) continue;
+    const wF = n - wB; if (!wF) break;
+    sB += i * hist[i];
+    const v = wB * wF * (sB / wB - (sum - sB) / wF) ** 2;
+    if (v > best) { best = v; t = i; }
+  }
+  return t;
+}
+
+// تجهيز الصورة قبل القراءة. يكتشف نوعها تلقائيًا:
+// - ورق فاتح (مسح ضوئي): تدرج رمادي + (اختياريًا) شد التباين وإزالة خطوط الجداول
+// - نص فاتح فوق خلفية داكنة أو صورة (تصاميم وإعلانات ولقطات شاشة):
+//   نعتبر أفتح البكسلات هي النص، فنحوّلها إلى نص أسود على أبيض ونمسح الخلفية
 function prepare(canvas, { contrast, lines }) {
   const W = canvas.width, H = canvas.height;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -169,21 +189,35 @@ function prepare(canvas, { contrast, lines }) {
     const v = (d[i] * 299 + d[i + 1] * 587 + d[i + 2] * 114) / 1000 | 0;
     g[j] = v; hist[v]++;
   }
-  if (contrast) {
-    const total = W * H;
-    let lo = 0, hi = 255, acc = 0;
-    for (; lo < 255; lo++) { acc += hist[lo]; if (acc > total * 0.01) break; }
-    acc = 0;
-    for (; hi > 0; hi--) { acc += hist[hi]; if (acc > total * 0.05) break; }
-    if (hi - lo >= 40) {
-      const lut = new Uint8ClampedArray(256);
-      for (let v = 0; v < 256; v++) lut[v] = ((v - lo) * 255) / (hi - lo);
-      for (let j = 0; j < g.length; j++) g[j] = lut[g[j]];
+  let acc = 0, median = 0;
+  for (; median < 255; median++) { acc += hist[median]; if (acc >= g.length / 2) break; }
+
+  let mode = 'paper';
+  if (median < 110) {
+    mode = 'light-on-dark';
+    const t1 = otsu(hist);
+    const th = Math.max(otsu(hist, t1 + 1), t1 + 20);
+    for (let j = 0; j < g.length; j++) g[j] = g[j] >= th ? 0 : 255;
+  } else {
+    if (contrast) {
+      const total = W * H;
+      let lo = 0, hi = 255;
+      acc = 0;
+      for (; lo < 255; lo++) { acc += hist[lo]; if (acc > total * 0.01) break; }
+      acc = 0;
+      for (; hi > 0; hi--) { acc += hist[hi]; if (acc > total * 0.05) break; }
+      if (hi - lo >= 40) {
+        const lut = new Uint8ClampedArray(256);
+        for (let v = 0; v < 256; v++) lut[v] = ((v - lo) * 255) / (hi - lo);
+        for (let j = 0; j < g.length; j++) g[j] = lut[g[j]];
+      }
     }
+    // إزالة الخطوط تخص الورق الفاتح فقط؛ على الخلفيات الداكنة كانت تمسح أجزاء من الصورة
+    if (lines) removeVerticalLines(g, W, H);
   }
-  if (lines) removeVerticalLines(g, W, H);
   for (let i = 0, j = 0; i < d.length; i += 4, j++) d[i] = d[i + 1] = d[i + 2] = g[j];
   ctx.putImageData(img, 0, 0);
+  canvas.dataset.mode = mode;
   return canvas;
 }
 
