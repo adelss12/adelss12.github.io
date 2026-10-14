@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#08111f">
+  <meta name="description" content="استخراج النص العربي والإنجليزي من ملفات PDF المصوّرة والصور، داخل جهازك">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="استخراج النص">
+  <title>استخراج النص</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+
+    <header class="top">
+      <img class="logo" src="icon.svg" alt="" width="64" height="64">
+      <div>
+        <h1>استخراج النص</h1>
+        <p>اقرأ النص العربي والإنجليزي من ملفات PDF المصوّرة (الماسحة الضوئية) والصور.</p>
+      </div>
+    </header>
+
+    <section class="panel" id="pickPanel">
+      <label class="drop" id="drop" for="file">
+        <input id="file" type="file" accept="application/pdf,image/*" multiple hidden>
+        <span class="drop-icon" aria-hidden="true">📄</span>
+        <strong>اختر ملف PDF أو صورة</strong>
+        <span class="muted">أو اسحب الملف وأفلته هنا · يمكنك اختيار أكثر من ملف</span>
+      </label>
+
+      <div class="options">
+        <label class="opt">
+          <span>اللغة الغالبة في المستند</span>
+          <select id="lang">
+            <option value="ara+eng" selected>عربي مع إنجليزي</option>
+            <option value="eng+ara">إنجليزي مع عربي</option>
+            <option value="ara">عربي فقط</option>
+            <option value="eng">إنجليزي فقط</option>
+          </select>
+        </label>
+        <label class="opt">
+          <span>شكل الصفحة</span>
+          <select id="layout">
+            <option value="3" selected>تلقائي (معاملات وفواتير)</option>
+            <option value="4">عمود واحد (خطاب أو نص متصل)</option>
+            <option value="11">نص متفرق (جداول وإيصالات)</option>
+          </select>
+        </label>
+        <label class="opt check">
+          <input id="enhance" type="checkbox" checked>
+          <span>تحسين الصورة قبل القراءة <small class="muted">(ينفع مع المسح الباهت)</small></span>
+        </label>
+      </div>
+
+      <p class="privacy">🔒 القراءة تتم داخل جهازك، ولا يُرفع الملف إلى أي مكان. أول استخدام يحتاج إنترنت لتنزيل ملفات اللغة مرة واحدة.</p>
+    </section>
+
+    <section class="panel status" id="statusPanel" hidden>
+      <div class="status-row">
+        <strong id="statusText">جارٍ التجهيز…</strong>
+        <button class="btn ghost small" id="cancelBtn" type="button">إيقاف</button>
+      </div>
+      <div class="bar"><span id="bar"></span></div>
+      <small class="muted" id="statusSub"></small>
+    </section>
+
+    <section class="panel" id="resultPanel" hidden>
+      <div class="result-head">
+        <div>
+          <h2>النص المستخرج</h2>
+          <small class="muted" id="summary"></small>
+        </div>
+        <div class="actions">
+          <button class="btn" id="copyAll" type="button">نسخ الكل</button>
+          <button class="btn ghost" id="dlTxt" type="button">تنزيل TXT</button>
+          <button class="btn ghost" id="dlDoc" type="button">تنزيل Word</button>
+          <button class="btn ghost" id="newBtn" type="button">ملف جديد</button>
+        </div>
+      </div>
+      <div id="pages"></div>
+    </section>
+
+    <footer>استخراج النص · من برامج عادل</footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+  <script type="module" src="app.js"></script>
+  <script src="https://adelss12.github.io/back.js" defer></script>
+</body>
+</html>
