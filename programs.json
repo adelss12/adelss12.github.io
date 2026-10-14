@@ -133,7 +133,7 @@
       "desc": "نسخ تعريفات Windows احتياطيًا واستعادتها بواجهة رسومية.",
       "section": "windows",
       "type": "windows",
-      "url": "https://github.com/adelss12/DriverBackup",
+      "url": "https://github.com/adelss12/DriverBackup/releases/latest",
       "repo": "DriverBackup",
       "emoji": "💾"
     },
