@@ -48,6 +48,16 @@
       "icon": "https://adelss12.github.io/qr/apple-touch-icon.png"
     },
     {
+      "id": "ocr",
+      "name": "استخراج النص",
+      "desc": "اقرأ النص العربي والإنجليزي من ملفات PDF المصوّرة بالماسحة والصور، داخل جهازك.",
+      "section": "tools",
+      "type": "web",
+      "url": "https://adelss12.github.io/ocr/",
+      "repo": "adelss12.github.io",
+      "icon": "ocr/apple-touch-icon.png"
+    },
+    {
       "id": "taqlis-pdf",
       "name": "تقليص PDF",
       "desc": "قلّص حجم PDF، وادمج الملفات ونظّم صفحاتها، وحوّل الصور إلى PDF.",
