@@ -120,7 +120,7 @@
     {
       "id": "syncfile",
       "name": "SyncFile",
-      "desc": "مزامنة مجلدات العمل بين أجهزة بلا إنترنت عن طريق الفلاش، بلا ضياع لأي ملف.",
+      "desc": "مزامنة أي مجلدين بلا إنترنت (الجهاز والفلاش) على طريقة GoodSync: تحليل ثم مزامنة، بلا ضياع لأي ملف.",
       "section": "windows",
       "type": "windows",
       "url": "https://github.com/adelss12/SyncFile/releases/latest",
