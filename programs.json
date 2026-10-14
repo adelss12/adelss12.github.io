@@ -118,6 +118,16 @@
       "icon": "dawaak-icon.svg"
     },
     {
+      "id": "syncfile",
+      "name": "SyncFile",
+      "desc": "مزامنة مجلدات العمل بين أجهزة بلا إنترنت عن طريق الفلاش، بلا ضياع لأي ملف.",
+      "section": "windows",
+      "type": "windows",
+      "url": "https://github.com/adelss12/SyncFile/releases/latest",
+      "repo": "SyncFile",
+      "emoji": "🔄"
+    },
+    {
       "id": "smart-file-organizer",
       "name": "منظّم الملفات الذكي",
       "desc": "فحص الملفات وتنظيمها في مجلدات وكشف الملفات المكررة.",
