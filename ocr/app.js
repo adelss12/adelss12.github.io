@@ -7,7 +7,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 
 const $ = (id) => document.getElementById(id);
 const els = {
-  file: $('file'), drop: $('drop'), lang: $('lang'), layout: $('layout'), enhance: $('enhance'),
+  file: $('file'), drop: $('drop'), lang: $('lang'), layout: $('layout'), enhance: $('enhance'), lines: $('lines'),
   pickPanel: $('pickPanel'), statusPanel: $('statusPanel'), statusText: $('statusText'),
   statusSub: $('statusSub'), bar: $('bar'), cancelBtn: $('cancelBtn'),
   resultPanel: $('resultPanel'), pages: $('pages'), summary: $('summary'),
@@ -47,20 +47,70 @@ let currentPageBase = 0;
 let currentPageShare = 1;
 
 async function recognizeCanvas(canvas) {
-  const w = await getWorker(els.lang.value);
+  const lang = els.lang.value;
+  const w = await getWorker(lang);
   await w.setParameters({
     tessedit_pageseg_mode: els.layout.value,
     preserve_interword_spaces: '1',
     user_defined_dpi: String(TARGET_DPI),
   });
-  const { data } = await w.recognize(canvas);
-  return { text: cleanText(data.text), conf: Math.round(data.confidence || 0) };
+  const { data } = await w.recognize(canvas, {}, { text: true, blocks: true });
+  let text = data.text;
+  // عند خلط العربي بالإنجليزي قد تُقرأ كلمة عربية كحروف إنجليزية عشوائية؛ نعيد قراءتها بالعربي فقط
+  if (lang.includes('ara') && lang.includes('eng') && !cancelled) {
+    text = await rereadArabic(canvas, data, text);
+  }
+  return { text: cleanText(text), conf: Math.round(data.confidence || 0) };
+}
+
+const BIDI = /[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g;
+const hasArabic = (s) => /[\u0600-\u06FF]/.test(s);
+const looksLatinWord = (s) => /^[A-Za-z]{2,5}[.,:;]?$/.test(s);
+let arWorker = null;
+
+async function rereadArabic(canvas, data, text) {
+  const suspects = [];
+  for (const b of data.blocks || []) for (const p of b.paragraphs) for (const l of p.lines) {
+    const words = l.words.map((w) => ({ w, t: w.text.replace(BIDI, '') }));
+    const ar = words.filter((x) => hasArabic(x.t)).length;
+    if (ar < words.length * 0.5) continue;
+    for (const x of words) {
+      if (looksLatinWord(x.t) && x.w.confidence < 80) suspects.push({ t: x.t, box: x.w.bbox, line: l.bbox });
+    }
+  }
+  if (!suspects.length) return text;
+  if (!arWorker) {
+    arWorker = await Tesseract.createWorker(['ara'], 1);
+    await arWorker.setParameters({ tessedit_pageseg_mode: '7' });
+  }
+  let out = text.replace(BIDI, '');
+  for (const s of suspects.slice(0, 40)) {
+    if (cancelled) break;
+    const lh = s.line.y1 - s.line.y0, pad = Math.round(lh * 0.4);
+    const c = document.createElement('canvas');
+    c.width = s.box.x1 - s.box.x0 + pad * 2;
+    c.height = lh + pad * 2;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(canvas, s.box.x0 - pad, s.line.y0 - pad, c.width, c.height, 0, 0, c.width, c.height);
+    const r = (await arWorker.recognize(c)).data;
+    const nt = r.text.replace(BIDI, '').replace(/[|¦\[\](){}]/g, '').trim();
+    if (nt && hasArabic(nt) && !/[A-Za-z\s]/.test(nt)) out = out.replace(s.t, nt);
+  }
+  return out;
 }
 
 function cleanText(t) {
   return (t || '')
+    .replace(BIDI, '')
     .replace(/\r/g, '')
+    // ة و ى لا تأتيان إلا آخر الكلمة: إن التصقت بها كلمة بعدها نفصلهما
+    .replace(/([ةى])(?=[\u0621-\u064A])/g, '$1 ')
+    // بقايا خطوط الجداول
+    .replace(/(^|[ \t])[|¦]+(?=[ \t]|$)/gm, '$1')
     .split('\n').map((l) => l.replace(/[ \t]+$/g, '')).join('\n')
+    .replace(/\n[ \t]*(?=\n)/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
@@ -104,32 +154,64 @@ async function renderImage(file, rotation) {
   return canvas;
 }
 
-// تحسين الصورة: تدرج رمادي + شد التباين، يفيد مع المسح الباهت أو الأصفر
-function enhance(canvas) {
+// تجهيز الصورة: تدرج رمادي دائمًا، ثم (اختياريًا) شد التباين وإزالة خطوط الجداول
+function prepare(canvas, { contrast, lines }) {
+  const W = canvas.width, H = canvas.height;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const img = ctx.getImageData(0, 0, W, H);
   const d = img.data;
+  const g = new Uint8ClampedArray(W * H);
   const hist = new Uint32Array(256);
-  for (let i = 0; i < d.length; i += 4) {
-    const g = (d[i] * 299 + d[i + 1] * 587 + d[i + 2] * 114) / 1000 | 0;
-    d[i] = g;
-    hist[g]++;
+  for (let i = 0, j = 0; i < d.length; i += 4, j++) {
+    const v = (d[i] * 299 + d[i + 1] * 587 + d[i + 2] * 114) / 1000 | 0;
+    g[j] = v; hist[v]++;
   }
-  const total = d.length / 4;
-  let lo = 0, hi = 255, acc = 0;
-  for (; lo < 255; lo++) { acc += hist[lo]; if (acc > total * 0.01) break; }
-  acc = 0;
-  for (; hi > 0; hi--) { acc += hist[hi]; if (acc > total * 0.05) break; }
-  if (hi - lo < 40) { lo = 0; hi = 255; }
-  const range = hi - lo;
-  const lut = new Uint8ClampedArray(256);
-  for (let v = 0; v < 256; v++) lut[v] = ((v - lo) * 255) / range;
-  for (let i = 0; i < d.length; i += 4) {
-    const v = lut[d[i]];
-    d[i] = d[i + 1] = d[i + 2] = v;
+  if (contrast) {
+    const total = W * H;
+    let lo = 0, hi = 255, acc = 0;
+    for (; lo < 255; lo++) { acc += hist[lo]; if (acc > total * 0.01) break; }
+    acc = 0;
+    for (; hi > 0; hi--) { acc += hist[hi]; if (acc > total * 0.05) break; }
+    if (hi - lo >= 40) {
+      const lut = new Uint8ClampedArray(256);
+      for (let v = 0; v < 256; v++) lut[v] = ((v - lo) * 255) / (hi - lo);
+      for (let j = 0; j < g.length; j++) g[j] = lut[g[j]];
+    }
   }
+  if (lines) removeVerticalLines(g, W, H);
+  for (let i = 0, j = 0; i < d.length; i += 4, j++) d[i] = d[i + 1] = d[i + 2] = g[j];
   ctx.putImageData(img, 0, 0);
   return canvas;
+}
+
+// الخطوط العمودية في الجداول تربك القراءة العربية (تُقرأ كحرف ا أو |).
+// نبحث عن أعمدة داكنة طويلة متصلة، مع سماح بسيط لميلان المسح، ونمسحها.
+// الخطوط الأفقية نتركها لأن التجربة أثبتت أنها تساعد على فصل صفوف الجدول.
+function removeVerticalLines(g, W, H) {
+  const BAND = 2;
+  const minLen = Math.max(H * 0.035, 180);
+  const dark = new Uint8Array(W * H);
+  for (let i = 0; i < g.length; i++) dark[i] = g[i] < 150 ? 1 : 0;
+  const col = new Uint8Array(H);
+  for (let x = 0; x < W; x++) {
+    for (let y = 0; y < H; y++) {
+      let v = 0;
+      for (let k = -BAND; k <= BAND && !v; k++) {
+        const xx = x + k;
+        if (xx >= 0 && xx < W && dark[y * W + xx]) v = 1;
+      }
+      col[y] = v;
+    }
+    let s = -1;
+    for (let y = 0; y <= H; y++) {
+      const v = y < H && col[y];
+      if (v && s < 0) s = y;
+      if (!v && s >= 0) {
+        if (y - s >= minLen) for (let k = s; k < y; k++) if (dark[k * W + x]) g[k * W + x] = 255;
+        s = -1;
+      }
+    }
+  }
 }
 
 function thumbnail(canvas) {
@@ -202,7 +284,7 @@ async function processPage(p) {
     : await renderImage(p.source.file, p.rotation);
   p.el.querySelector('img').src = thumbnail(canvas);
   if (cancelled) { release(canvas); return; }
-  if (els.enhance.checked) enhance(canvas);
+  prepare(canvas, { contrast: els.enhance.checked, lines: els.lines.checked });
   const r = await recognizeCanvas(canvas);
   release(canvas);
   p.text = r.text;
@@ -218,7 +300,7 @@ function finish() {
   els.summary.textContent = cancelled
     ? `توقفت القراءة · ${done} من ${pages.length} صفحة`
     : `${pages.length} صفحة · ${chars.toLocaleString('ar-SA')} حرف`;
-  if (!cancelled && pages.length && !chars) toast('لم يُعثر على نص. جرّب تدوير الصفحة أو إيقاف تحسين الصورة.');
+  if (!cancelled && pages.length && !chars) toast('لم يُعثر على نص. جرّب تدوير الصفحة أو تغيير شكل الصفحة.');
 }
 
 // ---------- الواجهة ----------
@@ -317,6 +399,7 @@ els.cancelBtn.addEventListener('click', async () => {
   cancelled = true;
   setStatus('جارٍ الإيقاف…', '');
   if (worker) { await worker.terminate(); worker = null; workerLang = ''; }
+  if (arWorker) { await arWorker.terminate(); arWorker = null; }
 });
 
 els.copyAll.addEventListener('click', () => copy(allText()));

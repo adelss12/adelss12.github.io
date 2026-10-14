@@ -47,14 +47,18 @@
         <label class="opt">
           <span>شكل الصفحة</span>
           <select id="layout">
-            <option value="3" selected>تلقائي (معاملات وفواتير)</option>
-            <option value="4">عمود واحد (خطاب أو نص متصل)</option>
-            <option value="11">نص متفرق (جداول وإيصالات)</option>
+            <option value="6" selected>معاملات وفواتير (يحافظ على صفوف الجداول)</option>
+            <option value="3">صفحة بأعمدة أو أقسام متفرقة</option>
+            <option value="11">نص متفرق (إيصالات وملصقات)</option>
           </select>
         </label>
         <label class="opt check">
-          <input id="enhance" type="checkbox" checked>
-          <span>تحسين الصورة قبل القراءة <small class="muted">(ينفع مع المسح الباهت)</small></span>
+          <input id="lines" type="checkbox" checked>
+          <span>إزالة خطوط الجداول قبل القراءة <small class="muted">(أدق مع الفواتير)</small></span>
+        </label>
+        <label class="opt check">
+          <input id="enhance" type="checkbox">
+          <span>تقوية التباين <small class="muted">(للمسح الباهت أو الورق المصفر)</small></span>
         </label>
       </div>
 
