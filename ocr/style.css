@@ -59,6 +59,13 @@ body {
 .drop strong { font-size: 19px; }
 .drop .muted { font-size: 14px; }
 
+.paste-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 14px; margin-top: 14px; font-size: 14px; }
+kbd {
+  font: 12px/1 ui-monospace, Menlo, Consolas, monospace; color: #fff;
+  background: rgba(255,255,255,.12); border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: 6px; padding: 3px 6px; direction: ltr; display: inline-block;
+}
+
 .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-top: 16px; }
 .opt { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--muted); }
 .opt select {

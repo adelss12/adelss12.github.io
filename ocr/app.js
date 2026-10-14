@@ -400,6 +400,50 @@ els.file.addEventListener('change', () => { handleFiles(els.file.files); els.fil
 ['dragleave', 'drop'].forEach((t) => els.drop.addEventListener(t, (e) => { e.preventDefault(); els.drop.classList.remove('over'); }));
 els.drop.addEventListener('drop', (e) => handleFiles(e.dataTransfer.files));
 
+// ---------- لصق صورة ----------
+
+function pastedFile(blob, i) {
+  const ext = (blob.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
+  const name = 'صورة ملصقة' + (i ? ' ' + (i + 1) : '') + '.' + ext;
+  return new File([blob], name, { type: blob.type || 'image/png' });
+}
+
+// Ctrl+V / Cmd+V في أي مكان بالصفحة
+document.addEventListener('paste', (e) => {
+  const items = Array.from((e.clipboardData && e.clipboardData.items) || []);
+  const files = items
+    .filter((it) => it.kind === 'file' && (it.type.startsWith('image/') || it.type === 'application/pdf'))
+    .map((it, i) => { const f = it.getAsFile(); return f && f.type === 'application/pdf' ? f : f && pastedFile(f, i); })
+    .filter(Boolean);
+  if (!files.length) return;           // لصق نص عادي داخل مربع النص يبقى كما هو
+  e.preventDefault();
+  if (busy) { toast('انتظر حتى تنتهي القراءة الحالية'); return; }
+  handleFiles(files);
+});
+
+// زر «لصق صورة» (مفيد على الجوال وعند عدم استخدام لوحة المفاتيح)
+$('pasteBtn').addEventListener('click', async () => {
+  if (!navigator.clipboard || !navigator.clipboard.read) {
+    toast('متصفحك لا يدعم الزر؛ اضغط Ctrl+V بعد نسخ الصورة');
+    return;
+  }
+  try {
+    const items = await navigator.clipboard.read();
+    const files = [];
+    for (const it of items) {
+      const type = it.types.find((t) => t.startsWith('image/'));
+      if (type) files.push(pastedFile(await it.getType(type), files.length));
+    }
+    if (!files.length) { toast('لا توجد صورة منسوخة. انسخ الصورة أولًا ثم اضغط الزر'); return; }
+    handleFiles(files);
+  } catch (err) {
+    console.error(err);
+    toast(err && err.name === 'NotAllowedError'
+      ? 'اسمح للمتصفح بالوصول إلى الحافظة، أو اضغط Ctrl+V'
+      : 'تعذر قراءة الحافظة. جرّب Ctrl+V');
+  }
+});
+
 els.cancelBtn.addEventListener('click', async () => {
   cancelled = true;
   setStatus('جارٍ الإيقاف…', '');
