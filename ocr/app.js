@@ -79,10 +79,8 @@ async function rereadArabic(canvas, data, text) {
     }
   }
   if (!suspects.length) return text;
-  if (!arWorker) {
-    arWorker = await Tesseract.createWorker(['ara'], 1);
-    await arWorker.setParameters({ tessedit_pageseg_mode: '7' });
-  }
+  if (!arWorker) arWorker = await Tesseract.createWorker(['ara'], 1);
+  await arWorker.setParameters({ tessedit_pageseg_mode: '7' });
   let out = text.replace(BIDI, '');
   for (const s of suspects.slice(0, 40)) {
     if (cancelled) break;
@@ -101,6 +99,109 @@ async function rereadArabic(canvas, data, text) {
   return out;
 }
 
+// ---------- القراءة المتعددة للصور الصعبة ----------
+// تُقرأ الصورة بعدة معالجات: كما هي، ومقلوبة الألوان (نص أبيض على أسود)، وبعزل النص الفاتح
+// عن خلفية مصوّرة. ثم نأخذ من كل قراءة أوضح أسطرها ونرتبها حسب مكانها في الصورة.
+// هكذا تُقرأ الصورة المختلطة (جزء أبيض على داكن وجزء أسود على أبيض) في مرة واحدة.
+
+function otsuOf(hist, from = 0) { return otsu(hist, from); }
+
+function grayCanvas(W, H, g) {
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  const im = ctx.createImageData(W, H);
+  for (let i = 0, j = 0; j < g.length; i += 4, j++) { im.data[i] = im.data[i + 1] = im.data[i + 2] = g[j]; im.data[i + 3] = 255; }
+  ctx.putImageData(im, 0, 0);
+  return c;
+}
+
+function buildCandidates(canvas) {
+  const W = canvas.width, H = canvas.height;
+  const d = canvas.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, W, H).data;
+  const g = new Uint8ClampedArray(W * H), hist = new Uint32Array(256);
+  for (let i = 0, j = 0; i < d.length; i += 4, j++) { const v = (d[i] * 299 + d[i + 1] * 587 + d[i + 2] * 114) / 1000 | 0; g[j] = v; hist[v]++; }
+  const t1 = otsuOf(hist);
+  const tHi = Math.max(otsuOf(hist, t1 + 1), t1 + 20);
+  const normal = g.slice();
+  let acc = 0, median = 0;
+  for (; median < 255; median++) { acc += hist[median]; if (acc >= g.length / 2) break; }
+  if (median >= 110 && els.lines.checked) removeVerticalLines(normal, W, H);
+  return [
+    ['normal', grayCanvas(W, H, normal)],
+    ['inverted', grayCanvas(W, H, g.map((v) => 255 - v))],
+    ['bright', grayCanvas(W, H, g.map((v) => (v >= tHi ? 0 : 255)))],
+  ];
+}
+
+const letterCount = (s) => (s.match(/[\u0621-\u064AA-Za-z0-9\u0660-\u0669]/g) || []).length;
+const arabicShare = (s) => {
+  const a = (s.match(/[\u0621-\u064A]/g) || []).length, l = (s.match(/[A-Za-z]/g) || []).length;
+  return a / Math.max(1, a + l);
+};
+
+function linesOf(data, keep = () => true) {
+  const out = [];
+  for (const b of data.blocks || []) for (const p of b.paragraphs) for (const l of p.lines) {
+    const t = cleanText(l.text).replace(/\n/g, ' ').trim();
+    if (letterCount(t) < 2 || !keep(t)) continue;
+    out.push({ t, conf: l.confidence, box: l.bbox });
+  }
+  return out;
+}
+
+function boxOverlap(a, b) {
+  const ix = Math.max(0, Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0));
+  const iy = Math.max(0, Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0));
+  const m = Math.min((a.x1 - a.x0) * (a.y1 - a.y0), (b.x1 - b.x0) * (b.y1 - b.y0));
+  return m ? (ix * iy) / m : 0;
+}
+
+function mergeLines(all) {
+  const score = (l) => l.conf * Math.sqrt(letterCount(l.t));
+  const keep = [];
+  for (const l of all.filter((x) => x.conf >= 55).sort((a, b) => score(b) - score(a))) {
+    if (!keep.some((k) => boxOverlap(k.box, l.box) > 0.4)) keep.push(l);
+  }
+  keep.sort((a, b) => {
+    const ay = (a.box.y0 + a.box.y1) / 2, by = (b.box.y0 + b.box.y1) / 2;
+    const lh = Math.min(a.box.y1 - a.box.y0, b.box.y1 - b.box.y0);
+    return Math.abs(ay - by) > lh * 0.5 ? ay - by : b.box.x1 - a.box.x1; // نفس السطر: من اليمين لليسار
+  });
+  return keep;
+}
+
+async function multiPass(canvas) {
+  const lang = els.lang.value;
+  const mixed = lang.includes('ara') && lang.includes('eng');
+  const psm = els.layout.value === '11' ? '11' : '3';
+  const cands = buildCandidates(canvas);
+  const w = await getWorker(lang);
+  if (mixed && !arWorker) arWorker = await Tesseract.createWorker(['ara'], 1);
+  const passes = cands.length * (mixed ? 2 : 1);
+  const base = currentPageBase, share = currentPageShare;
+  const all = [];
+  let n = 0;
+  for (const [, c] of cands) {
+    if (cancelled) break;
+    currentPageBase = base + (share * n++) / passes; currentPageShare = share / passes;
+    await w.setParameters({ tessedit_pageseg_mode: psm, preserve_interword_spaces: '1' });
+    all.push(...linesOf((await w.recognize(c, {}, { blocks: true })).data));
+    if (mixed && !cancelled) {
+      currentPageBase = base + (share * n++) / passes;
+      await arWorker.setParameters({ tessedit_pageseg_mode: psm, preserve_interword_spaces: '1' });
+      // قراءة بالعربي وحده تمنع قراءة «ا» كحرف I أو |؛ نأخذ منها الأسطر العربية فقط
+      all.push(...linesOf((await arWorker.recognize(c, {}, { blocks: true })).data, (t) => arabicShare(t) > 0.9));
+    }
+    release(c);
+  }
+  currentPageBase = base; currentPageShare = share;
+  const kept = mergeLines(all);
+  const weight = kept.reduce((s, l) => s + letterCount(l.t), 0);
+  const conf = weight ? kept.reduce((s, l) => s + l.conf * letterCount(l.t), 0) / weight : 0;
+  return { text: cleanText(kept.map((l) => l.t).join('\n')), conf: Math.round(conf) };
+}
+
 function cleanText(t) {
   return (t || '')
     .replace(BIDI, '')
@@ -109,6 +210,13 @@ function cleanText(t) {
     .replace(/([ةى])(?=[\u0621-\u064A])/g, '$1 ')
     // «ء» آخر الكلمة تلتصق بها «ال» التالية كثيرًا: الذكاءالاصطناعي
     .replace(/ء(?=ال[\u0621-\u064A])/g, 'ء ')
+    // «ا» تُقرأ أحيانًا 1 أو I أو | قبل «ل»: لموارد1لبشرية ← لموارد البشرية
+    .replace(/([\u0621-\u064A])[|Il1][ \t]*(?=ل[\u0621-\u064A])/g, '$1 ا')
+    .replace(/(^|[ \t])[|Il1](?=ل[\u0621-\u064A])/gm, '$1ا')
+    .replace(/(^|[ \t])[|I](?=[\u0621-\u064A])/gm, '$1ا')
+    // رقم ملتصق بكلمة عربية: رقم2231 ← رقم 2231
+    .replace(/([\u0621-\u064A])(?=[0-9])/g, '$1 ')
+    .replace(/([0-9])(?=[\u0621-\u064A])/g, '$1 ')
     // بقايا خطوط الجداول: | منفردة، أو ١ ملتصقة بحرف عربي (لا تأتي هكذا في نص حقيقي)
     .replace(/(^|[ \t])[|¦]+(?=[ \t]|$)/gm, '$1')
     .replace(/([ء-يً-ْ])١+(?![٠-٩])/g, '$1')
@@ -318,14 +426,32 @@ async function processPage(p) {
   p.el.classList.add('working');
   p.el.querySelector('.page-text').value = '';
   p.el.querySelector('.conf').textContent = 'جارٍ القراءة…';
-  const canvas = p.source.kind === 'pdf'
-    ? await renderPdfPage(p.source.pdf, p.source.pageNo, p.rotation)
-    : await renderImage(p.source.file, p.rotation);
+  const render = () => (p.source.kind === 'pdf'
+    ? renderPdfPage(p.source.pdf, p.source.pageNo, p.rotation)
+    : renderImage(p.source.file, p.rotation));
+  const canvas = await render();
   p.el.querySelector('img').src = thumbnail(canvas);
   if (cancelled) { release(canvas); return; }
-  prepare(canvas, { contrast: els.enhance.checked, lines: els.lines.checked });
-  const r = await recognizeCanvas(canvas);
-  release(canvas);
+
+  let r;
+  if (p.source.kind === 'image') {
+    // الصور (ملصقة أو مرفوعة) تتنوع كثيرًا: نقرأها بكل المعالجات وندمج الأفضل
+    r = await multiPass(canvas);
+    release(canvas);
+  } else {
+    prepare(canvas, { contrast: els.enhance.checked, lines: els.lines.checked });
+    const dark = canvas.dataset.mode !== 'paper';
+    if (dark) { release(canvas); r = await multiPass(await render()); }
+    else {
+      r = await recognizeCanvas(canvas);
+      release(canvas);
+      // صفحة PDF قراءتها ضعيفة: نعيد المحاولة بالقراءة المتعددة ونأخذ الأفضل
+      if (r.conf < 65 && !cancelled) {
+        const m = await multiPass(await render());
+        if (m.conf > r.conf && m.text) r = m;
+      }
+    }
+  }
   p.text = r.text;
   p.conf = r.conf;
   updateCard(p);
