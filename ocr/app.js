@@ -75,7 +75,7 @@ async function rereadArabic(canvas, data, text) {
     const ar = words.filter((x) => hasArabic(x.t)).length;
     if (ar < words.length * 0.5) continue;
     for (const x of words) {
-      if (looksLatinWord(x.t) && x.w.confidence < 80) suspects.push({ t: x.t, box: x.w.bbox, line: l.bbox });
+      if (looksLatinWord(x.t) && x.w.confidence < 90) suspects.push({ t: x.t, box: x.w.bbox, line: l.bbox });
     }
   }
   if (!suspects.length) return text;
@@ -207,7 +207,16 @@ function removeVerticalLines(g, W, H) {
       const v = y < H && col[y];
       if (v && s < 0) s = y;
       if (!v && s >= 0) {
-        if (y - s >= minLen) for (let k = s; k < y; k++) if (dark[k * W + x]) g[k * W + x] = 255;
+        if (y - s >= minLen) {
+          // نمسح الخط وأطرافه الباهتة (بقايا الحواف تُقرأ أحيانًا كرقم ١)
+          for (let k = s; k < y; k++) {
+            if (!dark[k * W + x]) continue;
+            for (let dx = -2; dx <= 2; dx++) {
+              const xx = x + dx;
+              if (xx >= 0 && xx < W && g[k * W + xx] < 225) g[k * W + xx] = 255;
+            }
+          }
+        }
         s = -1;
       }
     }
