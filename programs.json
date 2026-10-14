@@ -1,0 +1,131 @@
+{
+  "_ملاحظة": "هذا الملف هو المرجع الوحيد لقائمة البرامج. لإضافة برنامج: أضف عنصرًا في programs واختر له قسمًا من sections. type = web (يفتح في المتصفح) أو windows (صفحة تنزيل).",
+  "sections": [
+    { "id": "money",   "title": "المال والعائلة",  "emoji": "💰" },
+    { "id": "tools",   "title": "أدوات يومية",     "emoji": "🧰" },
+    { "id": "info",    "title": "معلومات وصحة",    "emoji": "🌤️" },
+    { "id": "windows", "title": "برامج ويندوز",    "emoji": "🖥️", "note": "تُنزَّل وتعمل على جهاز الكمبيوتر" }
+  ],
+  "programs": [
+    {
+      "id": "masrofati",
+      "name": "مصروفاتي",
+      "desc": "تسجيل المصروفات الشخصية ومتابعتها بطريقة بسيطة وسريعة.",
+      "section": "money",
+      "type": "web",
+      "url": "https://adelss12.github.io/masrofati-iphone/",
+      "repo": "masrofati-iphone",
+      "icon": "https://adelss12.github.io/masrofati-iphone/apple-touch-icon.png"
+    },
+    {
+      "id": "family-fund",
+      "name": "صندوق العائلة",
+      "desc": "إدارة اشتراكات العائلة والإيرادات والمصروفات ومتابعة الصندوق.",
+      "section": "money",
+      "type": "web",
+      "url": "https://adelss12.github.io/family-fund/",
+      "repo": "family-fund",
+      "icon": "https://adelss12.github.io/family-fund/apple-touch-icon.png"
+    },
+    {
+      "id": "fc",
+      "name": "التقويم العائلي",
+      "desc": "مواعيد العائلة بالهجري والميلادي، مع المشاركة والمزامنة بين الأجهزة.",
+      "section": "money",
+      "type": "web",
+      "url": "https://adelss12.github.io/fc/",
+      "repo": "fc",
+      "icon": "https://adelss12.github.io/fc/apple-touch-icon.png"
+    },
+    {
+      "id": "qr",
+      "name": "صانع QR",
+      "desc": "رموز QR للواي فاي وجهات الاتصال وواتساب بألوانك، وقارئ بالكاميرا.",
+      "section": "tools",
+      "type": "web",
+      "url": "https://adelss12.github.io/qr/",
+      "repo": "qr",
+      "icon": "https://adelss12.github.io/qr/apple-touch-icon.png"
+    },
+    {
+      "id": "taqlis-pdf",
+      "name": "تقليص PDF",
+      "desc": "قلّص حجم PDF، وادمج الملفات ونظّم صفحاتها، وحوّل الصور إلى PDF.",
+      "section": "tools",
+      "type": "web",
+      "url": "https://adelss12.github.io/taqlis-pdf/",
+      "repo": "taqlis-pdf",
+      "icon": "https://adelss12.github.io/taqlis-pdf/apple-touch-icon.png"
+    },
+    {
+      "id": "maps",
+      "name": "تحويل الخرائط",
+      "desc": "تحويل المواقع المحفوظة وروابط Google Maps إلى خرائط Apple.",
+      "section": "tools",
+      "type": "web",
+      "url": "https://adelss12.github.io/google_to_apple_maps/",
+      "repo": "google_to_apple_maps",
+      "icon": "https://adelss12.github.io/google_to_apple_maps/apple-touch-icon.png"
+    },
+    {
+      "id": "contacts",
+      "name": "دليل أرقامي",
+      "desc": "إدارة جهات الاتصال والبحث فيها مع دعم ملفات VCF وCSV.",
+      "section": "tools",
+      "type": "web",
+      "url": "https://adelss12.github.io/contacts/",
+      "repo": "contacts",
+      "icon": "https://adelss12.github.io/contacts/assets/apple-touch-icon.png"
+    },
+    {
+      "id": "mywather",
+      "name": "طقسي",
+      "desc": "الطقس والتوقعات، والنجوم والمواسم كسهيل والوسم، والإنذارات الرسمية.",
+      "section": "info",
+      "type": "web",
+      "url": "https://adelss12.github.io/mywather/",
+      "repo": "mywather",
+      "icon": "mywather-icon.svg"
+    },
+    {
+      "id": "dawaak",
+      "name": "افهم دواءك",
+      "desc": "صوّر عبوة الدواء واعرف استخدامه وجرعاته وتحذيراته بالعربي.",
+      "section": "info",
+      "type": "web",
+      "url": "https://adelss12.github.io/dawaak/",
+      "repo": "dawaak",
+      "icon": "dawaak-icon.svg"
+    },
+    {
+      "id": "smart-file-organizer",
+      "name": "منظّم الملفات الذكي",
+      "desc": "فحص الملفات وتنظيمها في مجلدات وكشف الملفات المكررة.",
+      "section": "windows",
+      "type": "windows",
+      "url": "https://github.com/adelss12/smart-file-organizer",
+      "repo": "smart-file-organizer",
+      "emoji": "🗂️"
+    },
+    {
+      "id": "driver-backup",
+      "name": "نسخ التعريفات",
+      "desc": "نسخ تعريفات Windows احتياطيًا واستعادتها بواجهة رسومية.",
+      "section": "windows",
+      "type": "windows",
+      "url": "https://github.com/adelss12/DriverBackup",
+      "repo": "DriverBackup",
+      "emoji": "💾"
+    },
+    {
+      "id": "context-menu",
+      "name": "قائمة الزر الأيمن",
+      "desc": "التبديل بين القائمة الكلاسيكية والحديثة للزر الأيمن في Windows 11.",
+      "section": "windows",
+      "type": "windows",
+      "url": "https://github.com/adelss12/Restore-old-Right-click-Context-menu-in-Windows-11",
+      "repo": "Restore-old-Right-click-Context-menu-in-Windows-11",
+      "emoji": "🖱️"
+    }
+  ]
+}

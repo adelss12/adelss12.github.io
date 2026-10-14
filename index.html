@@ -166,6 +166,40 @@
       transition: opacity .2s ease;
     }
 
+
+    [hidden] { display: none !important; }
+
+    /* الأقسام */
+    .search { margin: 0 auto 30px; max-width: 520px; }
+    .search input {
+      width: 100%; font: inherit; font-size: 16px; color: #fff;
+      background: rgba(255,255,255,.075); border: 1px solid rgba(255,255,255,.14);
+      border-radius: 16px; padding: 13px 18px; outline: none;
+    }
+    .search input::placeholder { color: #8293aa; }
+    .search input:focus { border-color: #36a3ff; background: rgba(255,255,255,.1); }
+
+    .group { margin-bottom: 38px; }
+    .group-head {
+      display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+      margin: 0 4px 14px; padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .group-head h2 { font-size: 20px; }
+    .group-head .count {
+      font-size: 12px; color: #b9c7da; background: rgba(255,255,255,.08);
+      padding: 2px 9px; border-radius: 99px;
+    }
+    .group-head small { color: #8293aa; font-size: 13px; }
+
+    .app-icon.emoji {
+      display: flex; align-items: center; justify-content: center; font-size: 36px;
+      background: linear-gradient(135deg, rgba(20,123,209,.35), rgba(11,165,148,.35));
+    }
+    .open.download { background: linear-gradient(135deg, #4b5d78, #2f3d52); }
+    .empty, .load-error { text-align: center; color: #b9c7da; padding: 30px 0; }
+    .load-error a { color: #36a3ff; }
+
     footer {
       text-align: center;
       color: #8293aa;
@@ -270,6 +304,13 @@
         transform: rotate(45deg);
       }
 
+
+      .search { margin-bottom: 22px; }
+      .group { margin-bottom: 26px; }
+      .group-head h2 { font-size: 17px; }
+      .app-icon.emoji { font-size: 28px; }
+      .open.download { background: none; }
+
       footer {
         margin-top: 30px;
         font-size: 13px;
@@ -296,99 +337,12 @@
       </p>
     </header>
 
-    <section class="apps">
+    <div class="search">
+      <input id="q" type="search" placeholder="ابحث عن برنامج…" aria-label="ابحث عن برنامج" autocomplete="off">
+    </div>
 
-      <!-- افهم دواءك -->
-      <article class="card">
-        <div class="app-icon">
-          <img loading="lazy" decoding="async" width="72" height="72" src="dawaak-icon.svg" alt="أيقونة افهم دواءك">
-        </div>
-        <h2>افهم دواءك</h2>
-        <p>صوّر عبوة الدواء واعرف استخدامه وجرعاته وتحذيراته بالعربي.</p>
-        <a class="open" href="https://adelss12.github.io/dawaak/">فتح البرنامج</a>
-      </article>
-
-      <!-- طقسي -->
-      <article class="card">
-        <div class="app-icon">
-          <img loading="lazy" decoding="async" width="72" height="72" src="mywather-icon.svg" alt="أيقونة طقسي">
-        </div>
-        <h2>طقسي</h2>
-        <p>الطقس والتوقعات، والنجوم والمواسم كسهيل والوسم، والإنذارات الرسمية.</p>
-        <a class="open" href="https://adelss12.github.io/mywather/">فتح البرنامج</a>
-      </article>
-
-      <!-- التقويم العائلي -->
-      <article class="card">
-        <div class="app-icon">
-          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/fc/apple-touch-icon.png" alt="التقويم العائلي">
-        </div>
-        <h2>التقويم العائلي</h2>
-        <p>مواعيد العائلة بالهجري والميلادي، مع المشاركة والمزامنة بين الأجهزة.</p>
-        <a class="open" href="https://adelss12.github.io/fc/">فتح البرنامج</a>
-      </article>
-
-      <!-- دليل أرقامي -->
-      <article class="card">
-        <div class="app-icon">
-          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/contacts/assets/apple-touch-icon.png" alt="دليل أرقامي">
-        </div>
-        <h2>دليل أرقامي</h2>
-        <p>إدارة جهات الاتصال والبحث فيها مع دعم ملفات VCF وCSV.</p>
-        <a class="open" href="https://adelss12.github.io/contacts/">فتح البرنامج</a>
-      </article>
-
-      <!-- مصروفاتي -->
-      <article class="card">
-        <div class="app-icon">
-          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/masrofati-iphone/apple-touch-icon.png" alt="مصروفاتي">
-        </div>
-        <h2>مصروفاتي</h2>
-        <p>تسجيل المصروفات الشخصية ومتابعتها بطريقة بسيطة وسريعة.</p>
-        <a class="open" href="https://adelss12.github.io/masrofati-iphone/">فتح البرنامج</a>
-      </article>
-
-      <!-- صانع QR -->
-      <article class="card">
-        <div class="app-icon">
-          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/qr/apple-touch-icon.png" alt="صانع QR">
-        </div>
-        <h2>صانع QR</h2>
-        <p>رموز QR للواي فاي وجهات الاتصال وواتساب بألوانك، وقارئ بالكاميرا.</p>
-        <a class="open" href="https://adelss12.github.io/qr/">فتح البرنامج</a>
-      </article>
-
-      <!-- تحويل الخرائط -->
-      <article class="card">
-        <div class="app-icon">
-          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/google_to_apple_maps/apple-touch-icon.png" alt="تحويل الخرائط">
-        </div>
-        <h2>تحويل الخرائط</h2>
-        <p>تحويل المواقع المحفوظة وروابط Google Maps إلى خرائط Apple.</p>
-        <a class="open" href="https://adelss12.github.io/google_to_apple_maps/">فتح البرنامج</a>
-      </article>
-
-      <!-- صندوق العائلة -->
-      <article class="card">
-        <div class="app-icon">
-          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/family-fund/apple-touch-icon.png" alt="صندوق العائلة">
-        </div>
-        <h2>صندوق العائلة</h2>
-        <p>إدارة اشتراكات العائلة والإيرادات والمصروفات ومتابعة الصندوق.</p>
-        <a class="open" href="https://adelss12.github.io/family-fund/">فتح البرنامج</a>
-      </article>
-
-      <!-- تقليص PDF -->
-      <article class="card">
-        <div class="app-icon">
-          <img loading="lazy" decoding="async" width="72" height="72" src="https://adelss12.github.io/taqlis-pdf/apple-touch-icon.png" alt="تقليص PDF">
-        </div>
-        <h2>تقليص PDF</h2>
-        <p>قلّص حجم PDF، وادمج الملفات ونظّم صفحاتها، وحوّل الصور إلى PDF.</p>
-        <a class="open" href="https://adelss12.github.io/taqlis-pdf/">فتح البرنامج</a>
-      </article>
-
-    </section>
+    <div id="sections" aria-live="polite"></div>
+    <p id="empty" class="empty" hidden>لا يوجد برنامج بهذا الاسم.</p>
 
     <footer>
       <div>برامج وأدوات شخصية من تطوير عادل الغامدي</div>
@@ -397,5 +351,81 @@
 
   </main>
 
+
+  <script>
+  (function () {
+    var root = document.getElementById('sections');
+    var empty = document.getElementById('empty');
+    var q = document.getElementById('q');
+
+    function el(tag, cls, text) {
+      var e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text != null) e.textContent = text;
+      return e;
+    }
+
+    function card(p) {
+      var a = el('article', 'card');
+      a.dataset.search = (p.name + ' ' + p.desc).toLowerCase();
+      var ic = el('div', 'app-icon' + (p.icon ? '' : ' emoji'));
+      if (p.icon) {
+        var img = el('img');
+        img.loading = 'lazy'; img.decoding = 'async';
+        img.width = 72; img.height = 72; img.src = p.icon; img.alt = p.name;
+        ic.appendChild(img);
+      } else {
+        ic.textContent = p.emoji || '📦';
+        ic.setAttribute('aria-hidden', 'true');
+      }
+      var link = el('a', 'open' + (p.type === 'windows' ? ' download' : ''),
+                    p.type === 'windows' ? 'صفحة التنزيل' : 'فتح البرنامج');
+      link.href = p.url;
+      if (p.type === 'windows') { link.target = '_blank'; link.rel = 'noopener'; }
+      a.append(ic, el('h2', null, p.name), el('p', null, p.desc), link);
+      return a;
+    }
+
+    function render(data) {
+      data.sections.forEach(function (s) {
+        var items = data.programs.filter(function (p) { return p.section === s.id; });
+        if (!items.length) return;
+        var g = el('section', 'group');
+        g.id = s.id;
+        var head = el('div', 'group-head');
+        head.append(el('h2', null, (s.emoji ? s.emoji + ' ' : '') + s.title),
+                    el('span', 'count', items.length));
+        if (s.note) head.appendChild(el('small', null, s.note));
+        var grid = el('div', 'apps');
+        items.forEach(function (p) { grid.appendChild(card(p)); });
+        g.append(head, grid);
+        root.appendChild(g);
+      });
+    }
+
+    function filter() {
+      var term = q.value.trim().toLowerCase();
+      var any = false;
+      root.querySelectorAll('.group').forEach(function (g) {
+        var shown = 0;
+        g.querySelectorAll('.card').forEach(function (c) {
+          var ok = !term || c.dataset.search.indexOf(term) !== -1;
+          c.hidden = !ok;
+          if (ok) shown++;
+        });
+        g.hidden = shown === 0;
+        if (shown) any = true;
+      });
+      empty.hidden = any;
+    }
+
+    fetch('programs.json', { cache: 'no-cache' })
+      .then(function (r) { if (!r.ok) throw r; return r.json(); })
+      .then(function (data) { render(data); q.addEventListener('input', filter); })
+      .catch(function () {
+        root.innerHTML = '<p class="load-error">تعذر تحميل قائمة البرامج. <a href="">أعد المحاولة</a></p>';
+      });
+  })();
+  </script>
 </body>
 </html>
