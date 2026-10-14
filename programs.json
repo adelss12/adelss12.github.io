@@ -78,6 +78,26 @@
       "icon": "https://adelss12.github.io/contacts/assets/apple-touch-icon.png"
     },
     {
+      "id": "monabbih",
+      "name": "منبّه",
+      "desc": "تنبيه بقرب انتهاء الاشتراكات والوثائق كالجواز والرخصة، بالهجري والميلادي.",
+      "section": "tools",
+      "type": "web",
+      "url": "https://adelss12.github.io/monabbih/",
+      "repo": "monabbih",
+      "icon": "https://adelss12.github.io/monabbih/apple-touch-icon.png"
+    },
+    {
+      "id": "shortcuts",
+      "name": "اختصارات",
+      "desc": "اختصارات مفيدة للآيفون جاهزة للتثبيت والمشاركة.",
+      "section": "tools",
+      "type": "web",
+      "url": "https://adelss12.github.io/shortcuts/",
+      "repo": "shortcuts",
+      "emoji": "⚡"
+    },
+    {
       "id": "mywather",
       "name": "طقسي",
       "desc": "الطقس والتوقعات، والنجوم والمواسم كسهيل والوسم، والإنذارات الرسمية.",
